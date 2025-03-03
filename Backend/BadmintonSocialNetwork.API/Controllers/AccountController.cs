@@ -250,6 +250,7 @@ namespace BadmintonSocialNetwork.API.Controllers
             }
         }
 
+        [RolesAuthorize("Admin")]
         [HttpGet]
         [Route("get-accounts")]
         public async Task<IActionResult> GetAccounts([FromQuery] DefaultSearch defaultSearch)
@@ -264,7 +265,7 @@ namespace BadmintonSocialNetwork.API.Controllers
             }
         }
 
-
+        [RolesAuthorize("Admin")]
         [HttpGet]
         [Route("get-account-by-id")]
         public async Task<IActionResult> GetAccountById(int accountId)
@@ -280,6 +281,7 @@ namespace BadmintonSocialNetwork.API.Controllers
             }
         }
 
+        [RolesAuthorize("Admin")]
         [HttpDelete]
         [Route("delete-account/{id}")]
         public async Task<IActionResult> DeleteAccount(int id)
@@ -296,6 +298,7 @@ namespace BadmintonSocialNetwork.API.Controllers
             }
         }
 
+        [RolesAuthorize("Admin")]
         [HttpPut]
         [Route("forgot-password")]
         public async Task<IActionResult> ForgotPassword(string email, string password, string confirmPassword)
@@ -323,6 +326,7 @@ namespace BadmintonSocialNetwork.API.Controllers
             }
         }
 
+        [RolesAuthorize("Admin", "User")]
         [HttpPut]
         [Route("change-password")]
         public async Task<IActionResult> ChangePassword(string password, string confirmPassword)
@@ -349,6 +353,50 @@ namespace BadmintonSocialNetwork.API.Controllers
 
                 await _unitOfWork.SaveAsync();
                 return Ok("Change password successfully!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [RolesAuthorize("Admin", "User")]
+        [HttpPut]
+        [Route("update-profile/{accountId}")]
+        public async Task<IActionResult> UpdateProfile(int accountId, [FromBody] AccountUM accountUM)
+        {
+            try
+            {
+                var response = await _accountService.UpdateProfile(accountId, accountUM);
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response.Message);
+                }
+
+                await _unitOfWork.SaveAsync();
+                return Ok(new { Message = response.Message, Data = response.Data });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [RolesAuthorize("Admin", "User")]
+        [HttpPut]
+        [Route("update-avatar/{accountId}")]
+        public async Task<IActionResult> UpdateAvatar(int accountId, IFormFile avatarFile)
+        {
+            try
+            {
+                var response = await _accountService.UpdateAvatar(accountId, avatarFile);
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response.Message);
+                }
+
+                await _unitOfWork.SaveAsync();
+                return Ok(new { Message = response.Message, Data = response.Data });
             }
             catch (Exception ex)
             {

@@ -32,19 +32,22 @@ namespace BadmintonSocialNetwork.Service.Services
         Task<int> GetCurrentAccountFromToken();
         Task<ResponseDTO<AccountVM>> ChangeEmail(int accountId, string newEmail);
         Task<bool> ChangePassword(int accountId, string password);
+        Task<ResponseDTO<AccountVM>> UpdateProfile(int accountId, AccountUM accountUM);
+        Task<ResponseDTO<AccountVM>> UpdateAvatar(int accountId, IFormFile avatarFile);
     }
     public class AccountService : IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IMailService _mailService;
-        public AccountService(IUnitOfWork unitOfWork, 
-                              IMapper mapper,
-                              IMailService mailService)
+        private readonly ICloudinaryService _cloudinaryService;
+
+        public AccountService(IUnitOfWork unitOfWork, IMapper mapper, IMailService mailService, ICloudinaryService cloudinaryService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _mailService = mailService;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<ResponseDTO<AccountVM>> DeleteAccount(int accountId)
@@ -151,10 +154,10 @@ namespace BadmintonSocialNetwork.Service.Services
                 addedAccount.PasswordHash = PasswordHasher.HashPassword(accountCM.Password);
                 if (addedAccount.Gender.Equals("Male"))
                 {
-                    addedAccount.Avatar = "https://localhost:7018/male";
+                    addedAccount.Avatar = "https://res.cloudinary.com/dlr60hykj/image/upload/v1740966148/BadmintonSocialNetworkImages/male-default-avatar_pu5fdx.jpg";
                 } else
                 {
-                    addedAccount.Avatar = "https://localhost:7018/female";
+                    addedAccount.Avatar = "https://res.cloudinary.com/dlr60hykj/image/upload/v1740966148/BadmintonSocialNetworkImages/female-default-avatar_sqy407.jpg";
                 }
                 await _unitOfWork.AccountRepository.InsertAsync(addedAccount);
                 await _unitOfWork.SaveAsync();
@@ -218,8 +221,6 @@ namespace BadmintonSocialNetwork.Service.Services
                 }
                 updatedAccount.UserName = accountUM.UserName;
                 updatedAccount.FullName = accountUM.FullName;
-                updatedAccount.Email = accountUM.Email;
-                updatedAccount.PhoneNumber = accountUM.PhoneNumber;
                 updatedAccount.DateOfBirth = accountUM.DateOfBirth;
                 updatedAccount.Gender = accountUM.Gender;
                 _unitOfWork.AccountRepository.Update(updatedAccount);
@@ -432,6 +433,84 @@ namespace BadmintonSocialNetwork.Service.Services
             {
                 Console.WriteLine(ex.Message);
                 return false;
+            }
+        }
+
+        public async Task<ResponseDTO<AccountVM>> UpdateProfile(int accountId, AccountUM accountUM)
+        {
+            var response = new ResponseDTO<AccountVM>();
+            try
+            {
+                var account = await _unitOfWork.AccountRepository.GetByID(accountId);
+
+                if (account is null)
+                {
+                    response.Data = null;
+                    response.IsSuccess = false;
+                    response.Message = $"Cannot find any account with id = {accountId}!";
+                    return response;
+                }
+
+                account.UserName = accountUM.UserName;
+                account.FullName = accountUM.FullName;
+                account.DateOfBirth = accountUM.DateOfBirth;
+                account.Gender = accountUM.Gender;
+                _unitOfWork.AccountRepository.Update(account);
+                await _unitOfWork.SaveAsync();
+
+                var accountVM = _mapper.Map<Account, AccountVM>(account);
+                response.Data = accountVM;
+                response.IsSuccess = true;
+                response.Message = "Update profile successfully!";
+                return response;
+            } catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+                response.Data = null;
+                return response;
+            }
+        }
+
+        public async Task<ResponseDTO<AccountVM>> UpdateAvatar(int accountId, IFormFile avatarFile)
+        {
+            var response = new ResponseDTO<AccountVM>();
+            try
+            {
+                var account = await _unitOfWork.AccountRepository.GetByID(accountId);
+
+                if (account is null)
+                {
+                    response.Data = null;
+                    response.IsSuccess = false;
+                    response.Message = $"Cannot find any account with id = {accountId}!";
+                    return response;
+                }
+
+                var uploadResult = await _cloudinaryService.UploadImageToCloudinaryAsync(avatarFile);
+                if (uploadResult is null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Upload image to cloudinary failed!";
+                    response.Data = null;
+                }
+
+                account.Avatar = uploadResult.SecureUrl.AbsoluteUri;
+                _unitOfWork.AccountRepository.Update(account);
+                await _unitOfWork.SaveAsync();
+
+                var accountVM = _mapper.Map<Account, AccountVM>(account);
+                response.Data = accountVM;
+                response.IsSuccess = true;
+                response.Message = "Update avatar successfully!";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+                response.Data = null;
+                return response;
             }
         }
     }

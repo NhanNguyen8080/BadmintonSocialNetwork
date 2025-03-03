@@ -21,14 +21,6 @@ namespace BadmintonSocialNetwork.Service.DTOs
         [MaxLength(32, ErrorMessage = "Full Name cannot exceed 32 characters.")]
         public string FullName { get; set; }
 
-        [Required(ErrorMessage = "Email is required.")]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
-        public string Email { get; set; }
-
-        [Required(ErrorMessage = "Phone number is required.")]
-        [RegularExpression(@"^\+?[0-9]{10,15}$", ErrorMessage = "Invalid phone number format.")]
-        public string PhoneNumber { get; set; }
-
         [Required(ErrorMessage = "Date of Birth is required.")]
         public DateOnly DateOfBirth { get; set; }
 
@@ -43,11 +35,27 @@ namespace BadmintonSocialNetwork.Service.DTOs
         public string RoleName { get; set; }
         public int EmailOtp{ get; set; }
         public int PhoneNumberOtp { get; set; }
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Phone number is required.")]
+        [RegularExpression(@"^\+?[0-9]{10,15}$", ErrorMessage = "Invalid phone number format.")]
+        public string PhoneNumber { get; set; }
     }
 
     public class AccountCM : AccountDTO
     {
 
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Phone number is required.")]
+        [RegularExpression(@"^\+?[0-9]{10,15}$", ErrorMessage = "Invalid phone number format.")]
+        public string PhoneNumber { get; set; }
         [Required(ErrorMessage = "Password is required.")]
         [MinLength(8, ErrorMessage = "Password must be at least 8 characters.")]
         [MaxLength(32, ErrorMessage = "Password cannot exceed 32 characters.")]
@@ -58,10 +66,5 @@ namespace BadmintonSocialNetwork.Service.DTOs
     public class AccountUM : AccountDTO
     {
 
-        [Required(ErrorMessage = "Password is required.")]
-        [MinLength(8, ErrorMessage = "Password must be at least 8 characters.")]
-        [MaxLength(32, ErrorMessage = "Password cannot exceed 32 characters.")]
-        [CustomPasswordValidation]
-        public string Password { get; set; }
     }
 }
