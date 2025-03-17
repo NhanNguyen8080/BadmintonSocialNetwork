@@ -13,11 +13,12 @@ namespace BadmintonSocialNetwork.Repository.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Content { get; set; }
         public string? ImageFile { get; set; }
         public string AppearedPlace { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public bool Status { get; set; }
         public int AccountId { get; set; }
         public Account Account { get; set; }

@@ -39,6 +39,9 @@ namespace BadmintonSocialNetwork.Repository.Models
         [Column("PhoneNumber", TypeName = "varchar(12)")]
         public string PhoneNumber { get; set; }
 
+        [Column("Address", TypeName = "text")]
+        public string Address { get; set; }
+
         [Column("IsConfirmedPhoneNumber")]
         public bool IsConfirmedPhoneNumber { get; set; }
         [Column("DateOfBirth")]

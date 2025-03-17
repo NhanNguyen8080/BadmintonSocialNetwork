@@ -3,6 +3,7 @@ using System;
 using BadmintonSocialNetwork.Repository.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BadmintonSocialNetwork.API.Migrations
 {
     [DbContext(typeof(BadmintonSocialNetworkDBContext))]
-    partial class BadmintonSocialNetworkDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250317093937_create-Bookmar-table")]
+    partial class createBookmartable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,11 +32,6 @@ namespace BadmintonSocialNetwork.API.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("Address");
 
                     b.Property<string>("Avatar")
                         .IsRequired()
