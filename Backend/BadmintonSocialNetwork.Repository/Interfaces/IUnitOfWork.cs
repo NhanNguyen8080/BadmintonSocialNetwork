@@ -13,6 +13,10 @@ namespace BadmintonSocialNetwork.Repository.Interfaces
         IGenericRepository<Account> AccountRepository { get; }
         IGenericRepository<AccountRole> AccountRoleRepository { get; }
         IGenericRepository<Role> RoleRepository { get; }
+        IGenericRepository<Post> PostRepository { get; }
+        IGenericRepository<Like> LikeRepository { get; }
+        IGenericRepository<Comment> CommentRepository { get; }
+        IGenericRepository<Bookmark> BookmarkRepository { get; }
 
         Task SaveAsync();
     }
