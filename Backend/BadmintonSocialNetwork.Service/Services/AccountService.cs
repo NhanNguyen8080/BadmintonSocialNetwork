@@ -34,6 +34,7 @@ namespace BadmintonSocialNetwork.Service.Services
         Task<bool> ChangePassword(int accountId, string password);
         Task<ResponseDTO<AccountVM>> UpdateProfile(int accountId, AccountUM accountUM);
         Task<ResponseDTO<AccountVM>> UpdateAvatar(int accountId, IFormFile avatarFile);
+        Task<ResponseDTO<AccountVM>> UpdateCoverPhoto(int accountId, IFormFile avatarFile);
     }
     public class AccountService : IAccountService
     {
@@ -496,6 +497,48 @@ namespace BadmintonSocialNetwork.Service.Services
                 }
 
                 account.Avatar = uploadResult.SecureUrl.AbsoluteUri;
+                _unitOfWork.AccountRepository.Update(account);
+                await _unitOfWork.SaveAsync();
+
+                var accountVM = _mapper.Map<Account, AccountVM>(account);
+                response.Data = accountVM;
+                response.IsSuccess = true;
+                response.Message = "Update avatar successfully!";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+                response.Data = null;
+                return response;
+            }
+        }
+
+        public async Task<ResponseDTO<AccountVM>> UpdateCoverPhoto(int accountId, IFormFile avatarFile)
+        {
+            var response = new ResponseDTO<AccountVM>();
+            try
+            {
+                var account = await _unitOfWork.AccountRepository.GetByID(accountId);
+
+                if (account is null)
+                {
+                    response.Data = null;
+                    response.IsSuccess = false;
+                    response.Message = $"Cannot find any account with id = {accountId}!";
+                    return response;
+                }
+
+                var uploadResult = await _cloudinaryService.UploadImageToCloudinaryAsync(avatarFile);
+                if (uploadResult is null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Upload image to cloudinary failed!";
+                    response.Data = null;
+                }
+
+                account.CoverPhoto = uploadResult.SecureUrl.AbsoluteUri;
                 _unitOfWork.AccountRepository.Update(account);
                 await _unitOfWork.SaveAsync();
 

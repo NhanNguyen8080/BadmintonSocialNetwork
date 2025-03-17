@@ -21,6 +21,9 @@ namespace BadmintonSocialNetwork.Repository.Models
         [Column("Avatar", TypeName = "varchar(150)")]
         public required string Avatar { get; set; }
 
+        [Column("CoverPhoto", TypeName = "varchar(150)")]
+        public required string CoverPhoto { get; set; }
+
         [Column("Password", TypeName = "varchar(256)")]
         public required string PasswordHash { get; set; }
 

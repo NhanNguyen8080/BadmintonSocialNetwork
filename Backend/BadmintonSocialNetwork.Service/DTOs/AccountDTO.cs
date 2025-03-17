@@ -35,14 +35,10 @@ namespace BadmintonSocialNetwork.Service.DTOs
         public string RoleName { get; set; }
         public int EmailOtp{ get; set; }
         public int PhoneNumberOtp { get; set; }
-
-        [Required(ErrorMessage = "Email is required.")]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; }
-
-        [Required(ErrorMessage = "Phone number is required.")]
-        [RegularExpression(@"^\+?[0-9]{10,15}$", ErrorMessage = "Invalid phone number format.")]
         public string PhoneNumber { get; set; }
+        public string Avatar { get; set; }
+        public string CoverPhoto { get; set; }
     }
 
     public class AccountCM : AccountDTO

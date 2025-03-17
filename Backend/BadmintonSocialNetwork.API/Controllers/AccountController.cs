@@ -404,5 +404,27 @@ namespace BadmintonSocialNetwork.API.Controllers
             }
         }
 
+        [RolesAuthorize("Admin", "User")]
+        [HttpPut]
+        [Route("update-cover-photo/{accountId}")]
+        public async Task<IActionResult> UpdateCoverPhoto(int accountId, IFormFile coverPhotoFile)
+        {
+            try
+            {
+                var response = await _accountService.UpdateAvatar(accountId, coverPhotoFile);
+                if (!response.IsSuccess)
+                {
+                    return BadRequest(response.Message);
+                }
+
+                await _unitOfWork.SaveAsync();
+                return Ok(new { Message = response.Message, Data = response.Data });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
     }
 }
