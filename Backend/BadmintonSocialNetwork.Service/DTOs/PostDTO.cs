@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,13 +10,13 @@ namespace BadmintonSocialNetwork.Service.DTOs
     public class PostDTO
     {
         public string Content { get; set; }
-        public string? ImageFile { get; set; }
         public string AppearedPlace { get; set; }
     }
 
     public class PostVM : PostDTO
     {
         public int Id { get; set; }
+        public string? ImageLink { get; set; }
         public bool Status { get; set; }
         public int AccountId { get; set; }
         public string AcccountName { get; set; }
@@ -24,9 +25,11 @@ namespace BadmintonSocialNetwork.Service.DTOs
     }
     public class PostCM : PostDTO
     {
+        public FormFile? ImageFile { get; set; }
     }
 
     public class PostUM : PostDTO
     {
+        public FormFile? ImageFile { get; set; }
     }
 }

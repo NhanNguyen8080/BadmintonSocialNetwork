@@ -2,6 +2,7 @@
 using BadmintonSocialNetwork.Repository.Interfaces;
 using BadmintonSocialNetwork.Repository.Models;
 using BadmintonSocialNetwork.Service.DTOs;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -24,11 +25,13 @@ namespace BadmintonSocialNetwork.Service.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public PostService(IUnitOfWork unitOfWork, IMapper mapper)
+        public PostService(IUnitOfWork unitOfWork, IMapper mapper, ICloudinaryService cloudinaryService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<ResponseDTO<PostVM>> DeletePost(Guid postId)
@@ -74,10 +77,25 @@ namespace BadmintonSocialNetwork.Service.Services
                     response.Message = $"Cannot find any post with {postId}";
                     return response;
                 }
+
+                if (postUM.ImageFile is null)
+                {
+                    editedPost.ImageFile = "";
+                }
+
+                var uploadResult = await _cloudinaryService.UploadImageToCloudinaryAsync(postUM.ImageFile);
+                if (uploadResult is null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Upload image to cloudinary failed!";
+                    response.Data = null;
+                    return response;
+                }
                 editedPost.UpdatedAt = DateTime.Now;
                 editedPost.Content = postUM.Content;
-                editedPost.ImageFile = postUM.ImageFile;
                 editedPost.AppearedPlace = postUM.AppearedPlace;
+                editedPost.ImageFile = uploadResult.SecureUrl.AbsoluteUri;
+
                 _unitOfWork.PostRepository.Update(editedPost);
                 await _unitOfWork.SaveAsync();
 
@@ -160,9 +178,27 @@ namespace BadmintonSocialNetwork.Service.Services
             try
             {
                 var uploadedPost = _mapper.Map<Post>(postCM);
+
+                uploadedPost.ImageFile = "";
+
+                if (postCM.ImageFile is not null)
+                {
+                    var uploadResult = await _cloudinaryService.UploadImageToCloudinaryAsync(postCM.ImageFile);
+                    if (uploadResult is null || uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        response.IsSuccess = false;
+                        response.Message = "Upload image to cloudinary failed!";
+                        response.Data = null;
+                        return response;
+                    }
+                    uploadedPost.ImageFile = uploadResult.SecureUrl.AbsoluteUri;
+                }
+
+
                 uploadedPost.CreatedAt = DateTime.Now;
                 uploadedPost.Status = true;
                 uploadedPost.AccountId = await GetCurrentAccountFromToken();
+
                 await _unitOfWork.PostRepository.InsertAsync(uploadedPost);
                 await _unitOfWork.SaveAsync();
 
