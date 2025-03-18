@@ -30,6 +30,17 @@ namespace BadmintonSocialNetwork.Service.Helpers
             //CreateMap<Bookmark, BookmarkCM>().ReverseMap();
             //CreateMap<Bookmark, BookmarkUM>().ReverseMap();
             #endregion
+
+            #region Like
+            CreateMap<Like, LikeVM>().ReverseMap();
+            CreateMap<Like, LikeCM>().ReverseMap();
+            #endregion
+
+            #region Comment
+            CreateMap<Comment, CommentVM>().ReverseMap();
+            CreateMap<Comment, CommentCM>().ReverseMap();
+            CreateMap<Comment, CommentUM>().ReverseMap();
+            #endregion
         }
     }
 }

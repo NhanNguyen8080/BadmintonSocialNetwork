@@ -15,7 +15,7 @@ namespace BadmintonSocialNetwork.Service.DTOs
 
     public class PostVM : PostDTO
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string? ImageLink { get; set; }
         public bool Status { get; set; }
         public int AccountId { get; set; }

@@ -13,9 +13,12 @@ namespace BadmintonSocialNetwork.API.Extensions
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IJwtTokenFactory, JwtTokenFactory>();
-            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IMailService, MailService>();
             services.AddScoped<ICloudinaryService, CloudinaryService>();
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IPostService, PostService>();
+            services.AddScoped<ILikeService, LikeService>();
+            services.AddScoped<ICommentService, CommentService>();
             return services;
         }
 
