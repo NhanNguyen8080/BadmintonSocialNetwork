@@ -15,13 +15,14 @@ namespace BadmintonSocialNetwork.Repository.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public string Content { get; set; }
+        public string ImageLink { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public int AccountId { get; set; }
         public Account Account { get; set; }
-        public int PostId { get; set; }
+        public Guid PostId { get; set; }
         public Post Post { get; set; }
-        public int ParentCommentID { get; set; }
+        public Guid? ParentCommentID { get; set; }
         public Comment ParentComment { get; set; }
     }
 }

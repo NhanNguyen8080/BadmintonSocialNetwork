@@ -3,6 +3,7 @@ using System;
 using BadmintonSocialNetwork.Repository.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BadmintonSocialNetwork.API.Migrations
 {
     [DbContext(typeof(BadmintonSocialNetworkDBContext))]
-    partial class BadmintonSocialNetworkDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250318103955_Change-datatype-of-ParentCommentId-in-Comment-table")]
+    partial class ChangedatatypeofParentCommentIdinCommenttable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,7 +172,10 @@ namespace BadmintonSocialNetwork.API.Migrations
                     b.Property<Guid>("ParentCommentID")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("PostId")
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("PostId1")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -181,7 +187,7 @@ namespace BadmintonSocialNetwork.API.Migrations
 
                     b.HasIndex("ParentCommentID");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("PostId1");
 
                     b.ToTable("Comments");
                 });
@@ -314,7 +320,7 @@ namespace BadmintonSocialNetwork.API.Migrations
 
                     b.HasOne("BadmintonSocialNetwork.Repository.Models.Post", "Post")
                         .WithMany()
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("PostId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
