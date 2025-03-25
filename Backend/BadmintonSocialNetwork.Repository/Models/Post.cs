@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BadmintonSocialNetwork.Repository.Enums;
 
 namespace BadmintonSocialNetwork.Repository.Models
 {
@@ -20,7 +21,9 @@ namespace BadmintonSocialNetwork.Repository.Models
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public bool Status { get; set; }
+        public PostVisibility Visibility { get; set; }
         public int AccountId { get; set; }
         public Account Account { get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
 }

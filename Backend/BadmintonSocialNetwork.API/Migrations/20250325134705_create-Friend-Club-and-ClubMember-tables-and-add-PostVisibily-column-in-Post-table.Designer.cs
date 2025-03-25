@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BadmintonSocialNetwork.API.Migrations
 {
     [DbContext(typeof(BadmintonSocialNetworkDBContext))]
-    [Migration("20250318114800_Change-datatype-of-PostId-in-Comment-table")]
-    partial class ChangedatatypeofPostIdinCommenttable
+    [Migration("20250325134705_create-Friend-Club-and-ClubMember-tables-and-add-PostVisibily-column-in-Post-table")]
+    partial class createFriendClubandClubMembertablesandaddPostVisibilycolumninPosttable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -149,44 +149,71 @@ namespace BadmintonSocialNetwork.API.Migrations
                     b.ToTable("Bookmarks");
                 });
 
-            modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.Comment", b =>
+            modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.Club", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("ClubId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
+                    b.Property<string>("AvatarUrl")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ImageLink")
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ParentCommentID")
+                    b.HasKey("ClubId");
+
+                    b.ToTable("Clubs");
+                });
+
+            modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.ClubMember", b =>
+                {
+                    b.Property<Guid>("ClubId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("JoinedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ClubId", "AccountId");
 
                     b.HasIndex("AccountId");
 
-                    b.HasIndex("ParentCommentID");
+                    b.ToTable("ClubMembers");
+                });
 
-                    b.HasIndex("PostId");
+            modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.Friend", b =>
+                {
+                    b.Property<int>("RequesterId")
+                        .HasColumnType("integer");
 
-                    b.ToTable("Comments");
+                    b.Property<int>("AddresseeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("RequesterId", "AddresseeId");
+
+                    b.HasIndex("AddresseeId");
+
+                    b.ToTable("Friends");
                 });
 
             modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.Like", b =>
@@ -238,6 +265,9 @@ namespace BadmintonSocialNetwork.API.Migrations
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -301,31 +331,42 @@ namespace BadmintonSocialNetwork.API.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.Comment", b =>
+            modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.ClubMember", b =>
                 {
                     b.HasOne("BadmintonSocialNetwork.Repository.Models.Account", "Account")
-                        .WithMany()
+                        .WithMany("ClubMemberships")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BadmintonSocialNetwork.Repository.Models.Comment", "ParentComment")
-                        .WithMany()
-                        .HasForeignKey("ParentCommentID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BadmintonSocialNetwork.Repository.Models.Post", "Post")
-                        .WithMany()
-                        .HasForeignKey("PostId")
+                    b.HasOne("BadmintonSocialNetwork.Repository.Models.Club", "Club")
+                        .WithMany("Members")
+                        .HasForeignKey("ClubId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
 
-                    b.Navigation("ParentComment");
+                    b.Navigation("Club");
+                });
 
-                    b.Navigation("Post");
+            modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.Friend", b =>
+                {
+                    b.HasOne("BadmintonSocialNetwork.Repository.Models.Account", "Addressee")
+                        .WithMany("FriendsReceived")
+                        .HasForeignKey("AddresseeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BadmintonSocialNetwork.Repository.Models.Account", "Requester")
+                        .WithMany("FriendsRequested")
+                        .HasForeignKey("RequesterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Addressee");
+
+                    b.Navigation("Requester");
                 });
 
             modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.Like", b =>
@@ -361,6 +402,17 @@ namespace BadmintonSocialNetwork.API.Migrations
             modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.Account", b =>
                 {
                     b.Navigation("AccountRoles");
+
+                    b.Navigation("ClubMemberships");
+
+                    b.Navigation("FriendsReceived");
+
+                    b.Navigation("FriendsRequested");
+                });
+
+            modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.Club", b =>
+                {
+                    b.Navigation("Members");
                 });
 
             modelBuilder.Entity("BadmintonSocialNetwork.Repository.Models.Role", b =>

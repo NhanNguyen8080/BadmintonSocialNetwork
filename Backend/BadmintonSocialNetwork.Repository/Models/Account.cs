@@ -56,6 +56,11 @@ namespace BadmintonSocialNetwork.Repository.Models
         [Column("PhoneNumberOtp")]
         public int PhoneNumberOtp { get; set; }
         public ICollection<AccountRole> AccountRoles { get; set; }
+        public ICollection<ClubMember> ClubMemberships { get; set; }
+
+        // Friendships
+        public ICollection<Friend> FriendsRequested { get; set; }
+        public ICollection<Friend> FriendsReceived { get; set; }
 
     }
 }
